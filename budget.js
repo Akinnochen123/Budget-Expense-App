@@ -36,8 +36,11 @@ const budgetform = document.getElementById("budgetform");
 
 let expName = document.getElementById("expName");
 let expNumber = document.getElementById("expNumber");
-let id = 0;
-let details = [];
+
+
+let id = 1;
+
+let details = JSON.parse(localStorage.getItem("USEREXP")) || [0];
 
 function getBudgetAmount(amount) {
   
@@ -50,6 +53,10 @@ function getBudgetAmount(amount) {
       amountInput.style.border = "1px solid gray";
     }, 3000);
   } else {
+    
+    details[0] = amount;
+    //update localstorage
+    localStorage.setItem("USEREXP",JSON.stringify(details));
     budgetAmount.innerText = amount;
     balanceAmount.innerText = amount;
     expenseForm.style.display = "block";
@@ -98,22 +105,25 @@ function addExpenses(name, number) {
 }
 
 function displayExp(details) {
-  
+  //update the localstorage
+  localStorage.setItem("USEREXP",JSON.stringify(details));
   expValue.innerHTML = null;
-  for (i = 0; i < details.length; i++) {
+  for (i = 1; i < details.length; i++) {
     expValue.innerHTML += `
     <div class="expValue" id="${details[i].id}">
       <div id="expTitleName" class="exp"><p>${details[i].name}</p></div>
       <div id="expValueAmount" class="exp"><p> <span>Naira</span> ${details[i].number}</p></div>
       <div id="edite_delete">
         <p>
-          <button id="${details[i].id}" onclick="editExpDetails(${details[i].id})"> <img src="image/edit.svg" width="15" alt=""  /></button> 
-          <button id="${details[i].id}" onclick="delExpenseDetails(${details[i].id})"><img src="image/trash.svg" width="15" alt="" /></button>
+          <button id="${details[i].id}" onclick="editExpDetails(${details[i].id})"> <img src="images/edit.svg" width="15" alt=""  /></button> 
+          <button id="${details[i].id}" onclick="delExpenseDetails(${details[i].id})"><img src="images/trash.svg" width="15" alt="" /></button>
         </p>
       </div>
     </div>
   `;
   }
+  //display whatever the value is at index 0 which is equal to the budget amoount entered
+  budgetAmount.innerText = details[0];
   calcExpenses();
   displayExpenses.style.display = "block";
   
@@ -121,7 +131,7 @@ function displayExp(details) {
 
 function calcExpenses() {
   let totalExp = 0;
-  for (i = 0; i < details.length; i++) {
+  for (i = 1; i < details.length; i++) {
     totalExp = details[i].number + totalExp;
   }
   expensesAmount.innerText = totalExp;
@@ -180,6 +190,7 @@ addForm.addEventListener("submit", (e) => {
   getBudgetAmount(amountInput.value);
 });
 
-
-
-
+//event listener to load the items saved in the details variable which is the local storage in our case
+document.addEventListener("DOMContentLoaded",()=>{
+  displayExp(details);
+});
